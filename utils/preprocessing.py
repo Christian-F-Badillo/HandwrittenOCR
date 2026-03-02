@@ -21,19 +21,10 @@ def _add_padding(img: Image.Image):
     return temp_img
 
 
-def process_img(file: str):
-    img = Image.open(file).convert("L")
-
+def process_img(img: Image.Image):
     temp_out = _resize_data(img)
 
     if temp_out.height == 32 and temp_out.width == 128:
         return temp_out
     else:
         return _add_padding(temp_out)
-
-
-if __name__ == "__main__":
-    img = process_img(
-        "/home/quichoarch/Desktop/HandwrittenOCR/data/datos_entrenamiento/PERFECT_CUT_a_z_1_9/pre_conzuelo_A.0.jpg"
-    )
-    img.show()
