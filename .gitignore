@@ -15,4 +15,5 @@ wheels/
 
 # Local data
 data/
+dataset_kaggle/
 .ipynb_checkpoints/

@@ -3,9 +3,11 @@ import json
 from dataclasses import dataclass, field
 from typing import Callable, List, Dict, Tuple, Optional
 import torch
+from torch.utils import data
 from torch.utils.data import Dataset
 from torchvision.transforms import ToTensor
 from PIL import Image
+from core.tokenizer import Tokenizer
 
 
 @dataclass
@@ -33,7 +35,10 @@ def load_data(path: str) -> Datadict:
 
 class HandwrittenData(Dataset):
     def __init__(
-        self, datadict: Datadict, data_path: str, transform: Optional[Callable] = None
+        self,
+        datadict: Datadict,
+        data_path: str,
+        transform: Optional[Callable] = None,
     ) -> None:
         if not os.path.exists(data_path):
             raise FileNotFoundError(f"Not file o dir found: {data_path}")
@@ -61,3 +66,22 @@ class HandwrittenData(Dataset):
             img = self.to_tensor(img)
 
         return img, label
+
+
+class OCRcollateFn:
+    def __init__(self, tokenizer: Tokenizer) -> None:
+        self._tokenizer = tokenizer
+
+    def __call__(
+        self, batch: List[Tuple[torch.Tensor, str]]
+    ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+        features, labels = zip(*batch)
+
+        feat_tensor = torch.stack(features)
+
+        targets, targets_len = self._tokenizer.encoding(list(labels))
+
+        targets_tensor = torch.from_numpy(targets)
+        targets_len_tensor = torch.from_numpy(targets_len)
+
+        return feat_tensor, targets_tensor, targets_len_tensor
