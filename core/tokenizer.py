@@ -65,6 +65,12 @@ class Tokenizer:
 
         self._decode = {v: k for k, v in self._encode.items()}
 
+        self._ntokens = max(list(self._encode.values()))
+
+    @property
+    def ntokens(self):
+        return self._ntokens + 1  # Sum the empty char (<Blank>)
+
     def encoding(self, text: str | List[str]) -> Tuple[np.ndarray, np.ndarray]:
         if not isinstance(text, list):
             input_text = _str_to_charlist(str(text).lower())
